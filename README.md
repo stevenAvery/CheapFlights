@@ -5,6 +5,6 @@ Cheap Flights is a demo webapp with two main features:
 
 ## Usage
 ```
-dotnet restore
-dotnet run
+dotnet restore src
+dotnet run --project src
 ```
