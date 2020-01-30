@@ -2,7 +2,7 @@
     ViewData["Title"] = "Flights";
 }
 
-<table id="flightsTable" class="display" width="100%">
+<table id="flightsTable" class="table table-bordered" width="100%">
     <thead>
         <tr>
             <th>Origin City</th>
@@ -14,10 +14,11 @@
     </thead>
 </table>
 
-<link href="//cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css" rel="stylesheet" />
+<link href="https://cdn.datatables.net/1.10.20/css/dataTables.bootstrap4.min.css" rel="stylesheet" />
 
 @section Scripts {
-    <script src="//cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.20/js/dataTables.bootstrap4.min.js"></script>
     <script>
         $(document).ready(() => {
             $("#flightsTable").DataTable({
@@ -34,6 +35,7 @@
                     { "data": "cost" }
                 ],
                 "columnDefs": [
+                    // Render cost in currency format
                     {
                         "render": (data, type, row) =>
                             data.toLocaleString("en-CA", { style: "currency", currency: "CAD" }),
