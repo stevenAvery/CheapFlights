@@ -1,0 +1,46 @@
+﻿@{
+    ViewData["Title"] = "Flights";
+}
+
+<table id="flightsTable" class="display" width="100%">
+    <thead>
+        <tr>
+            <th>Origin City</th>
+            <th>Origin IATA Code</th>
+            <th>Destination City</th>
+            <th>Destination IATA Code</th>
+            <th>Cost</th>
+        </tr>
+    </thead>
+</table>
+
+<link href="//cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css" rel="stylesheet" />
+
+@section Scripts {
+    <script src="//cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+    <script>
+        $(document).ready(() => {
+            $("#flightsTable").DataTable({
+                "ajax": {
+                    "url": "/Flights/Data",
+                    "type": "GET",
+                    "datatype": "json"
+                },
+                "columns": [
+                    { "data": "origin.city" },
+                    { "data": "origin.iataCode" },
+                    { "data": "destination.city" },
+                    { "data": "destination.iataCode" },
+                    { "data": "cost" }
+                ],
+                "columnDefs": [
+                    {
+                        "render": (data, type, row) =>
+                            data.toLocaleString("en-CA", { style: "currency", currency: "CAD" }),
+                        "targets": 4
+                    }
+                ]
+            });
+        });
+    </script>
+}
