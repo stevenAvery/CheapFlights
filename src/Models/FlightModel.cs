@@ -1,5 +1,3 @@
-using System;
-
 namespace CheapFlights.Models
 {
     public class FlightModel

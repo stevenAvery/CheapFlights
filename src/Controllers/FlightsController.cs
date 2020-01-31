@@ -8,10 +8,10 @@ using CheapFlights.Models;
 
 namespace CheapFlights.Controllers
 {
-    [Route("Flights")]
+    [Route("")]
     public class FlightsController : Controller
     {
-        [HttpGet, Route("Data")]
+        [HttpGet, Route("Data/Flights")]
         public IActionResult AllFlights()
         {
             var londonAirport = new AirportModel() {
@@ -48,7 +48,7 @@ namespace CheapFlights.Controllers
             return new JsonResult(new { data = data });
         }
 
-        [HttpGet, Route("Index")]
+        [HttpGet, Route("Index"), Route("")]
         public IActionResult Index()
         {
             return View();
@@ -57,7 +57,31 @@ namespace CheapFlights.Controllers
         [HttpGet,  Route("Search")]
         public IActionResult Search()
         {
-            return View();
+            return View(new SearchModel() {
+                Airports = new List<AirportModel>() {
+                    new AirportModel() {
+                        City = "London",
+                        IataCode = "YXU"
+                    },
+                    new AirportModel() {
+                        City = "Toronto",
+                        IataCode = "YYZ"
+                    },
+                    new AirportModel() {
+                        City = "New York",
+                        IataCode = "JFK"
+                    }
+                }
+            });
+        }
+
+        [HttpPost,  Route("Search")]
+        public IActionResult Search(SearchModel searchModel)
+        {
+            if (!ModelState.IsValid)
+                return Search();
+
+            return new JsonResult(searchModel);
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

@@ -1,17 +1,34 @@
+@model CheapFlights.Models.SearchModel
+
 @{
     ViewData["Title"] = "Search Flights";
 }
 
-<form>
+@using (Html.BeginForm("Search", "Flights", FormMethod.Post))
+{
     <div class="form-row">
         <div class="col-5">
-            <input type="text" class="form-control" id="origin" placeholder="Origin City or IataCode">
+            @Html.DropDownListFor(
+                m => m.SelectedOriginId, 
+                new SelectList(Model.Airports, "IataCode", "City"),
+                "-- Select Origin --",
+                new {
+                    @class = "form-control" 
+                })
+            @Html.ValidationMessageFor(m => m.SelectedOriginId)
         </div>
         <div class="col-5">
-            <input type="text" class="form-control" id="destination" placeholder="Destination City or IataCode">
+            @Html.DropDownListFor(
+                m => m.SelectedDestinationId, 
+                new SelectList(Model.Airports, "IataCode", "City"),
+                "-- Select Destination --",
+                new {
+                    @class = "form-control" 
+                })
+            @Html.ValidationMessageFor(m => m.SelectedDestinationId)
         </div>
         <div class="col">
             <button type="submit" class="btn btn-primary">Search</button>
         </div>
     </div>
-</form>
+}
