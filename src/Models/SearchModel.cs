@@ -11,7 +11,7 @@ namespace CheapFlights.Models
 
         [Required]
         // TODO opposite of "Compare"
-        [Compare(nameof(SelectedOriginId), ErrorMessage = "Origin must not be the same as the desination.")]
+        // [Compare(nameof(SelectedOriginId), ErrorMessage = "Origin must not be the same as the destination.")]
         public string SelectedDestinationId { get; set; }
 
         public IEnumerable<AirportModel> Airports { get; set; }

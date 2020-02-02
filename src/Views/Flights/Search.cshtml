@@ -13,7 +13,7 @@
                 new SelectList(Model.Airports, "IataCode", "City"),
                 "-- Select Origin --",
                 new {
-                    @class = "form-control" 
+                    @class = "custom-select" 
                 })
             @Html.ValidationMessageFor(m => m.SelectedOriginId)
         </div>
@@ -23,7 +23,7 @@
                 new SelectList(Model.Airports, "IataCode", "City"),
                 "-- Select Destination --",
                 new {
-                    @class = "form-control" 
+                    @class = "custom-select" 
                 })
             @Html.ValidationMessageFor(m => m.SelectedDestinationId)
         </div>
