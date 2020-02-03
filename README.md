@@ -5,6 +5,9 @@ Cheap Flights is a demo webapp with two main features:
 
 ## Usage
 ```
-dotnet restore src
-dotnet run --project src
+cd src
+dotnet restore
+dotnet ef migrations add "Initial migration" # TODO
+dotnet ef database update
+dotnet run
 ```

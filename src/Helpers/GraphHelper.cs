@@ -16,7 +16,7 @@ namespace CheapFlights.Helpers {
 
     public static class GraphHelpers {
         public static Dictionary<string, List<(string, decimal)>> ToAdjacencyList(
-            this List<FlightModel> edgeList) {
+            this IEnumerable<FlightModel> edgeList) {
 
             var adjList = new Dictionary<string, List<(string, decimal)>>();
 

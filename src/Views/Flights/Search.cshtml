@@ -4,8 +4,8 @@
     ViewData["Title"] = "Search Flights";
 }
 
-@using (Html.BeginForm("Search", "Flights", FormMethod.Post))
-{
+@*@using (Ajax.BeginForm("Search", "Flights", new AjaxOptions { HttpMethod = "POST", UpdateTargetId = "cheapestPath" }))*@
+@using (Html.BeginForm("Search", "Flights", FormMethod.Post, new { id = "searchForm" })) {
     <div class="form-row">
         <div class="col-5">
             @Html.DropDownListFor(

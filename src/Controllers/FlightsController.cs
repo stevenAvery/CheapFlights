@@ -11,10 +11,16 @@ using CheapFlights.Helpers;
 namespace CheapFlights.Controllers {
     [Route("")]
     public class FlightsController : Controller {
+        private readonly IFlightsRepository _flightsRepository;
+
+        public FlightsController(IFlightsRepository flightsRepository) {
+            _flightsRepository = flightsRepository;
+        }
+
         [HttpGet, Route("Data/Flights")]
         public IActionResult AllFlights() {
             return new JsonResult(new { 
-                data = new FlightsRepository().GetAllFlights() // TODO dependency injection
+                data = _flightsRepository.GetAllFlights()
             });
         }
 
@@ -26,7 +32,7 @@ namespace CheapFlights.Controllers {
         [HttpGet, Route("Search")]
         public IActionResult Search() {
             return View(new SearchModel() {
-                Airports = new FlightsRepository().GetAllAirports() // TODO dependency injection
+                Airports = _flightsRepository.GetAllAirports()
             });
         }
 
@@ -35,10 +41,16 @@ namespace CheapFlights.Controllers {
             if (!ModelState.IsValid)
                 return Search();
 
-            var adjList = new FlightsRepository().GetAllFlights().ToAdjacencyList(); // TODO dependency injection
-            var result = adjList.ShortestPath(searchModel.SelectedOriginId, searchModel.SelectedDestinationId);
-
-            return new JsonResult(result);
+            var cheapestPath = _flightsRepository
+                .GetAllFlights()
+                .ToAdjacencyList()
+                .ShortestPath(searchModel.SelectedOriginId, searchModel.SelectedDestinationId);
+            
+            return new JsonResult(cheapestPath);
+            // return View(new SearchModel() {
+            //     Airports = _flightsRepository.GetAllAirports(),
+            //     Flights = cheapestPath
+            // });
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
