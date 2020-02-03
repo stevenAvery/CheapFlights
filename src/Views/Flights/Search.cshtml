@@ -4,7 +4,6 @@
     ViewData["Title"] = "Search Flights";
 }
 
-@*@using (Ajax.BeginForm("Search", "Flights", new AjaxOptions { HttpMethod = "POST", UpdateTargetId = "cheapestPath" }))*@
 @using (Html.BeginForm("Search", "Flights", FormMethod.Post, new { id = "searchForm" })) {
     <div class="form-row">
         <div class="col-5">
@@ -36,38 +35,32 @@
 @if (Model.Flights != null) {
     <div class="pt-4">
         <table id="flightsTable" class="table table-bordered" width="100%">
-        <thead>
-            <tr>
-                <th>Origin City</th>
-                <th>Origin IATA Code</th>
-                <th>Destination City</th>
-                <th>Destination IATA Code</th>
-                <th>Cost</th>
-            </tr>
-        </thead>
-        <tbody>
-        @foreach (FlightModel flight in Model.Flights) {
-            <tr>
-                <td>@flight.Origin.City</td>
-                <td>@flight.Origin.IataCode</td>
-                <td>@flight.Destination.City</td>
-                <td>@flight.Destination.IataCode</td>
-                <td>@flight.Cost</td>
-            </tr>
-        }
-        </tbody>
+            <thead>
+                <tr>
+                    <th>Origin City</th>
+                    <th>Origin IATA Code</th>
+                    <th>Destination City</th>
+                    <th>Destination IATA Code</th>
+                    <th>Cost</th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach (FlightModel flight in Model.Flights) {
+                <tr>
+                    <td>@flight.Origin.City</td>
+                    <td>@flight.Origin.IataCode</td>
+                    <td>@flight.Destination.City</td>
+                    <td>@flight.Destination.IataCode</td>
+                    <td class="text-right">@String.Format("{0:C}", @flight.Cost)</td>
+                </tr>
+            }
+            </tbody>
+            <tfoot>
+                <td class="text-right" colspan="4">Total:</td>
+                <td class="text-right">@String.Format("{0:C}", @Model.Flights.Sum(m => m.Cost))</td>
+            </tfoot>
         </table>
     </div>
 }
 
 <link href="https://cdn.datatables.net/1.10.20/css/dataTables.bootstrap4.min.css" rel="stylesheet" />
-
-@section Scripts {
-    <script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.10.20/js/dataTables.bootstrap4.min.js"></script>
-    <script>
-        // $(document).ready(() => {
-        //     $('#flightsTable').DataTable();
-        // });
-    </script>
-}

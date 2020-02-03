@@ -41,13 +41,20 @@ namespace CheapFlights.Controllers {
             if (!ModelState.IsValid)
                 return Search();
 
+            var airports = _flightsRepository.GetAllAirports();
             var cheapestPath = _flightsRepository
                 .GetAllFlights()
                 .ToAdjacencyList()
-                .ShortestPath(searchModel.SelectedOriginId, searchModel.SelectedDestinationId);
+                .ShortestPath(searchModel.SelectedOriginId, searchModel.SelectedDestinationId)
+                .Select(flight => new FlightModel() {
+                    Origin      = airports.First(airport => airport.IataCode == flight.Origin.IataCode),
+                    Destination = airports.First(airport => airport.IataCode == flight.Destination.IataCode),
+                    Cost = flight.Cost
+                })
+                .ToList();
             
             return View(new SearchModel() {
-                Airports = _flightsRepository.GetAllAirports(),
+                Airports = airports,
                 Flights = cheapestPath
             });
         }
