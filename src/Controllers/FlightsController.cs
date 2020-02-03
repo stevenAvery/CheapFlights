@@ -46,11 +46,10 @@ namespace CheapFlights.Controllers {
                 .ToAdjacencyList()
                 .ShortestPath(searchModel.SelectedOriginId, searchModel.SelectedDestinationId);
             
-            return new JsonResult(cheapestPath);
-            // return View(new SearchModel() {
-            //     Airports = _flightsRepository.GetAllAirports(),
-            //     Flights = cheapestPath
-            // });
+            return View(new SearchModel() {
+                Airports = _flightsRepository.GetAllAirports(),
+                Flights = cheapestPath
+            });
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

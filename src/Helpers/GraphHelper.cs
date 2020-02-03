@@ -82,7 +82,6 @@ namespace CheapFlights.Helpers {
             while (vertex != origin) {
                 var previous = vertices[vertex].Previous;
                 var distance = adjList[previous].Where(v => v.Item1 == vertex).First().Item2;
-                //result.Add(new Edge(previous, vertex, distance));
                 result.Add(new FlightModel() {
                     Origin = new AirportModel() { IataCode = previous },
                     Destination = new AirportModel() { IataCode = vertex },
