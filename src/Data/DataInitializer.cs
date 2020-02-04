@@ -3,6 +3,10 @@ using CheapFlights.Models;
 
 namespace CheapFlights.Data {
     public static class DataInitializer {
+        /// <summary>
+        /// Create and seed database, if it hasn't been initialized before.
+        /// </summary>
+        /// <param name="context">Application database context to initialize.</param>
         public static void Initialize(ApplicationDbContext context) {
             context.Database.EnsureCreated();
 

@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace CheapFlights.Models
 {
+    // source: https://www.devtrends.co.uk/blog/the-complete-guide-to-validation-in-asp.net-mvc-3-part-2
     [AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
     public sealed class NotEqualToAttribute : ValidationAttribute {
         private const string DefaultErrorMessage = "{0} cannot be the same as {1}.";

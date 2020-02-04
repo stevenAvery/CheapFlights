@@ -17,12 +17,20 @@ namespace CheapFlights.Controllers {
             _flightsRepository = flightsRepository;
         }
 
+        /// <summary>
+        /// Action to get all flight data in the application database.
+        /// </summary>
+        /// <returns>Flight view with list of flights in application database.</returns>
         [HttpGet, Route("Flights"), Route("")]
         public IActionResult Flights() {
             var flights = _flightsRepository.GetAllFlights();
             return View(flights);
         }
 
+        /// <summary>
+        /// Action to search for cheapest path from any pair of airports in the application database.
+        /// </summary>
+        /// <returns>Search view with list of airports in application database.</returns>
         [HttpGet, Route("Search")]
         public IActionResult Search() {
             return View(new SearchModel() {
@@ -30,6 +38,11 @@ namespace CheapFlights.Controllers {
             });
         }
 
+        /// <summary>
+        /// Action to search for cheapest path from specific pair of airports in the application database.
+        /// </summary>
+        /// <param name="searchModel">Contains origin and destination for search.</param>
+        /// <returns>Search view with list of airports in application database, and cheapest path from origin to detination.</returns>
         [HttpPost, Route("Search")]
         public IActionResult Search(SearchModel searchModel) {
             if (!ModelState.IsValid)

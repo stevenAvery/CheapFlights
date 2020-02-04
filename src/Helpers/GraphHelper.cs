@@ -5,6 +5,11 @@ using CheapFlights.Models;
 
 namespace CheapFlights.Helpers {
     public static class GraphHelpers {
+        /// <summary>
+        /// Converts list of edges (specifically flights) into an adjacency list.`
+        /// </summary>
+        /// <param name="edgeList">List of graph (specifically flights).</param>
+        /// <returns>Adjacency list of Iatacodes, and distances.</returns>
         public static Dictionary<string, List<(string, decimal)>> ToAdjacencyList(
             this IEnumerable<FlightModel> edgeList) {
 
@@ -23,6 +28,13 @@ namespace CheapFlights.Helpers {
             return adjList;
         }
 
+        /// <summary>
+        /// Finds the shortest path in a weighted graph from origin to destination.
+        /// </summary>
+        /// <param name="adList">The adjacency list that represents the graph.</param>
+        /// <param name="origin">Origin airport iatacode</param>
+        /// <param name="destination">Destination airport iatacode</param>
+        /// <returns>Shortest path from origin to destination.</returns>
         public static List<FlightModel> ShortestPath(
             this Dictionary<string, List<(string, decimal)>> adjList,
             string origin,
