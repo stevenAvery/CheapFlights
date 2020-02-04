@@ -68,3 +68,6 @@ _[Ss]cripts
 
 # VS Code
 .vscode
+
+# Application Database
+src/CheapFlights.db

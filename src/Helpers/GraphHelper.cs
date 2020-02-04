@@ -4,16 +4,6 @@ using System.Linq;
 using CheapFlights.Models;
 
 namespace CheapFlights.Helpers {
-    public class Vertex {
-        public enum ColourType {
-            White, Grey, Black
-        }
-
-        public ColourType Colour { get; set; } = ColourType.White;
-        public decimal Distance { get; set; } = decimal.MaxValue; // default to infinity
-        public string Previous { get; set; } = null;
-    }
-
     public static class GraphHelpers {
         public static Dictionary<string, List<(string, decimal)>> ToAdjacencyList(
             this IEnumerable<FlightModel> edgeList) {
@@ -59,7 +49,6 @@ namespace CheapFlights.Helpers {
             discoveredVertices.Enqueue(origin);
 
             while (discoveredVertices.TryDequeue(out string currentVertex)) {
-                // TODO make sure adjList contains currentVertex
                 foreach (var (adjVertex, adjDistance) in adjList[currentVertex]) {
                     // only update the previous vertex and distance, if this is a shorter path
                     if (vertices[currentVertex].Distance + adjDistance < vertices[adjVertex].Distance) {
@@ -67,7 +56,6 @@ namespace CheapFlights.Helpers {
                         vertices[adjVertex].Previous = currentVertex;
                     }
 
-                    // TODO make sure vertices contains adjVertex
                     if (vertices[adjVertex].Colour == Vertex.ColourType.White) {
                         vertices[adjVertex].Colour = Vertex.ColourType.Grey;
                         discoveredVertices.Enqueue(adjVertex);
@@ -92,6 +80,16 @@ namespace CheapFlights.Helpers {
             result.Reverse();
 
             return result;
+        }
+
+        private class Vertex {
+            public enum ColourType {
+                White, Grey, Black
+            }
+
+            public ColourType Colour { get; set; } = ColourType.White;
+            public decimal Distance { get; set; } = decimal.MaxValue; // default to infinity
+            public string Previous { get; set; } = null;
         }
     }
 }

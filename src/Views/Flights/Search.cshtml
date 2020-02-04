@@ -34,32 +34,8 @@
 
 @if (Model.Flights != null) {
     <div class="pt-4">
-        <table id="flightsTable" class="table table-bordered" width="100%">
-            <thead>
-                <tr>
-                    <th>Origin City</th>
-                    <th>Origin IATA Code</th>
-                    <th>Destination City</th>
-                    <th>Destination IATA Code</th>
-                    <th>Cost</th>
-                </tr>
-            </thead>
-            <tbody>
-            @foreach (FlightModel flight in Model.Flights) {
-                <tr>
-                    <td>@flight.Origin.City</td>
-                    <td>@flight.Origin.IataCode</td>
-                    <td>@flight.Destination.City</td>
-                    <td>@flight.Destination.IataCode</td>
-                    <td class="text-right">@String.Format("{0:C}", @flight.Cost)</td>
-                </tr>
-            }
-            </tbody>
-            <tfoot>
-                <td class="text-right" colspan="4">Total:</td>
-                <td class="text-right">@String.Format("{0:C}", @Model.Flights.Sum(m => m.Cost))</td>
-            </tfoot>
-        </table>
+        <h4>Best Deal @String.Format("{0:C}", @Model.Flights.Sum(m => m.Cost))</h4>
+        @await Html.PartialAsync("_FlightsTable", @Model.Flights)
     </div>
 }
 

@@ -17,16 +17,10 @@ namespace CheapFlights.Controllers {
             _flightsRepository = flightsRepository;
         }
 
-        [HttpGet, Route("Data/Flights")]
-        public IActionResult AllFlights() {
-            return new JsonResult(new { 
-                data = _flightsRepository.GetAllFlights()
-            });
-        }
-
-        [HttpGet, Route("Index"), Route("")]
-        public IActionResult Index() {
-            return View();
+        [HttpGet, Route("Flights"), Route("")]
+        public IActionResult Flights() {
+            var flights = _flightsRepository.GetAllFlights();
+            return View(flights);
         }
 
         [HttpGet, Route("Search")]

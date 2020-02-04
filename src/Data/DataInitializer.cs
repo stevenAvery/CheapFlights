@@ -115,6 +115,36 @@ namespace CheapFlights.Data {
                     Destination = context.Airports.First(airport => airport.IataCode == "DEL"),
                     Cost = 1800.00M
                 });
+                context.Flights.Add(new FlightModel() {
+                    Origin      = context.Airports.First(airport => airport.IataCode == "CPT"),
+                    Destination = context.Airports.First(airport => airport.IataCode == "DXB"),
+                    Cost = 2000.00M
+                });
+                context.Flights.Add(new FlightModel() {
+                    Origin      = context.Airports.First(airport => airport.IataCode == "DXB"),
+                    Destination = context.Airports.First(airport => airport.IataCode == "HND"),
+                    Cost = 2000.00M
+                });
+                context.Flights.Add(new FlightModel() {
+                    Origin      = context.Airports.First(airport => airport.IataCode == "HND"),
+                    Destination = context.Airports.First(airport => airport.IataCode == "AMS"),
+                    Cost = 1700.00M
+                });
+                context.Flights.Add(new FlightModel() {
+                    Origin      = context.Airports.First(airport => airport.IataCode == "DXB"),
+                    Destination = context.Airports.First(airport => airport.IataCode == "AMS"),
+                    Cost = 900.00M
+                });
+                context.Flights.Add(new FlightModel() {
+                    Origin      = context.Airports.First(airport => airport.IataCode == "ATL"),
+                    Destination = context.Airports.First(airport => airport.IataCode == "YYZ"),
+                    Cost = 400.00M
+                });
+                context.Flights.Add(new FlightModel() {
+                    Origin      = context.Airports.First(airport => airport.IataCode == "DEL"),
+                    Destination = context.Airports.First(airport => airport.IataCode == "ATL"),
+                    Cost = 2200.00M
+                });
 
                 context.SaveChanges();
             }
