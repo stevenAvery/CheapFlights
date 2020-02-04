@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using CheapFlights.Data;
 using CheapFlights.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace CheapFlights.Repositories {
     public class FlightsRepository : IFlightsRepository {
@@ -25,9 +26,10 @@ namespace CheapFlights.Repositories {
         /// </summary>
         /// <returns>List of all flights, with related airport data in the application database.</returns>
         public IEnumerable<FlightModel> GetAllFlights() {
-            var airports = _context.Airports.ToList();
-            var flights = _context.Flights.ToList();
-            return flights;
+            return _context.Flights
+                .Include(c => c.Origin) // load related data
+                .Include(c => c.Destination)
+                .ToList();
         }
     }
 }
