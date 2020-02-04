@@ -10,3 +10,13 @@ cd CheapFlights
 dotnet restore src
 dotnet run --project src
 ```
+
+## Samples - Desktop and Mobile
+### Flights
+![Flights](docs/Flights.png)
+
+### Search (Empty)
+![Search (Empty)](docs/SearchEmpty.png)
+
+### Search
+![Search](docs/Search.png)
