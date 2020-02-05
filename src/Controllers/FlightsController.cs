@@ -54,11 +54,16 @@ namespace CheapFlights.Controllers {
             var cheapestPath = flights
                 .ToAdjacencyList(flight => flight.Cost)
                 .ShortestPath(searchModel.SelectedOriginId, searchModel.SelectedDestinationId,
-                    0, decimal.MaxValue, (a, b) => a + b)
-                .Select(edge => new FlightModel() {
-                    Origin      = airports.First(airport => airport.IataCode == edge.Origin),
-                    Destination = airports.First(airport => airport.IataCode == edge.Destination),
-                    Cost = edge.Distance
+                    0, decimal.MaxValue, (a, b) => a + b) // TODO clean up
+                .Select(edge => {
+                    var flight = flights.First(checkFlight => 
+                        checkFlight.Origin.IataCode == edge.Origin && checkFlight.Destination.IataCode == edge.Destination);
+                    return new FlightModel() {
+                        Origin      = flight.Origin,
+                        Destination = flight.Destination,
+                        Cost        = edge.Distance,
+                        Duration    = flight.Duration
+                    };
                 })
                 .ToList();
             

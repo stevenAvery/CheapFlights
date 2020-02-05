@@ -8,6 +8,7 @@
             <th>Destination City</th>
             <th>Destination IATA Code</th>
             <th>Cost</th>
+            <th>Duration</th>
         </tr>
     </thead>
     <tbody>
@@ -18,6 +19,7 @@
             <td>@flight.Destination.City</td>
             <td>@flight.Destination.IataCode</td>
             <td class="text-right">@String.Format("{0:C}", @flight.Cost)</td>
+            <td>@flight.Duration.ToString("c")</td>
         </tr>
     }
     </tbody>

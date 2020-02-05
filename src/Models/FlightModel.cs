@@ -1,3 +1,4 @@
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -15,5 +16,8 @@ namespace CheapFlights.Models {
 
         [Required]
         public decimal Cost { get; set; }
+
+        [Required]
+        public TimeSpan Duration { get; set; }
     }
 }
