@@ -22,8 +22,8 @@ namespace CheapFlights.Controllers {
         /// </summary>
         /// <returns>Flight view with list of flights in application database.</returns>
         [HttpGet, Route("Flights"), Route("")]
-        public IActionResult Flights() {
-            var flights = _flightsRepository.GetAllFlights();
+        public async Task<IActionResult> Flights() {
+            var flights = await _flightsRepository.GetAllFlights();
             return View(flights);
         }
 
@@ -32,9 +32,10 @@ namespace CheapFlights.Controllers {
         /// </summary>
         /// <returns>Search view with list of airports in application database.</returns>
         [HttpGet, Route("Search")]
-        public IActionResult Search() {
+        public async Task<IActionResult> Search() {
+            var airports = await _flightsRepository.GetAllAirports();
             return View(new SearchModel() {
-                Airports = _flightsRepository.GetAllAirports()
+                Airports = airports
             });
         }
 
@@ -44,19 +45,20 @@ namespace CheapFlights.Controllers {
         /// <param name="searchModel">Contains origin and destination for search.</param>
         /// <returns>Search view with list of airports in application database, and cheapest path from origin to detination.</returns>
         [HttpPost, Route("Search")]
-        public IActionResult Search(SearchModel searchModel) {
+        public async Task<IActionResult> Search(SearchModel searchModel) {
             if (!ModelState.IsValid)
-                return Search();
+                return await Search();
 
-            var airports = _flightsRepository.GetAllAirports();
-            var cheapestPath = _flightsRepository
-                .GetAllFlights()
-                .ToAdjacencyList()
-                .ShortestPath(searchModel.SelectedOriginId, searchModel.SelectedDestinationId)
-                .Select(flight => new FlightModel() {
-                    Origin      = airports.First(airport => airport.IataCode == flight.Origin.IataCode),
-                    Destination = airports.First(airport => airport.IataCode == flight.Destination.IataCode),
-                    Cost = flight.Cost
+            var airports = await _flightsRepository.GetAllAirports();
+            var flights = await _flightsRepository.GetAllFlights();
+            var cheapestPath = flights
+                .ToAdjacencyList(flight => flight.Cost)
+                .ShortestPath(searchModel.SelectedOriginId, searchModel.SelectedDestinationId,
+                    0, decimal.MaxValue, (a, b) => a + b)
+                .Select(edge => new FlightModel() {
+                    Origin      = airports.First(airport => airport.IataCode == edge.Origin),
+                    Destination = airports.First(airport => airport.IataCode == edge.Destination),
+                    Cost = edge.Distance
                 })
                 .ToList();
             

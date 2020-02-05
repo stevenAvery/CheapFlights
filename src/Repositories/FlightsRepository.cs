@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using CheapFlights.Data;
 using CheapFlights.Models;
 using Microsoft.EntityFrameworkCore;
@@ -17,19 +18,19 @@ namespace CheapFlights.Repositories {
         /// List all airports in the application database.
         /// </summary>
         /// <returns>List of all airports in the application database.</returns>
-        public IEnumerable<AirportModel> GetAllAirports() {
-            return _context.Airports.ToList();
+        public async Task<IEnumerable<AirportModel>> GetAllAirports() {
+            return await _context.Airports.ToListAsync();
         }
 
         /// <summary>
         /// List all flights in the application database.
         /// </summary>
         /// <returns>List of all flights, with related airport data in the application database.</returns>
-        public IEnumerable<FlightModel> GetAllFlights() {
-            return _context.Flights
+        public async Task<IEnumerable<FlightModel>> GetAllFlights() {
+            return await _context.Flights
                 .Include(c => c.Origin) // load related data
                 .Include(c => c.Destination)
-                .ToList();
+                .ToListAsync();
         }
     }
 }

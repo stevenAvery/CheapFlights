@@ -1,9 +1,10 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using CheapFlights.Models;
 
 namespace CheapFlights.Repositories {
     public interface IFlightsRepository {
-        IEnumerable<AirportModel> GetAllAirports();
-        IEnumerable<FlightModel> GetAllFlights();
+        Task<IEnumerable<AirportModel>> GetAllAirports();
+        Task<IEnumerable<FlightModel>> GetAllFlights();
     }
 }

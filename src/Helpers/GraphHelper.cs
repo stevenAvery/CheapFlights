@@ -10,20 +10,21 @@ namespace CheapFlights.Helpers {
         /// </summary>
         /// <param name="edgeList">List of graph (specifically flights).</param>
         /// <returns>Adjacency list of Iatacodes, and distances.</returns>
-        public static Dictionary<string, List<(string, decimal)>> ToAdjacencyList(
-            this IEnumerable<FlightModel> edgeList) {
+        public static Dictionary<string, List<(string, T)>> ToAdjacencyList<T>(
+            this IEnumerable<FlightModel> edgeList,
+            Func<FlightModel, T> weightFunc) {
 
-            var adjList = new Dictionary<string, List<(string, decimal)>>();
+            var adjList = new Dictionary<string, List<(string, T)>>();
 
             var originVertices = edgeList.Select(edge => edge.Origin.IataCode);
             var destinationVertices = edgeList.Select(edge => edge.Destination.IataCode);
             var distinctVertices = originVertices.Concat(destinationVertices).Distinct();
 
             foreach (var vertex in distinctVertices)
-                adjList.Add(vertex, new List<(string, decimal)>());
+                adjList.Add(vertex, new List<(string, T)>());
 
             foreach(var edge in edgeList)
-                adjList[edge.Origin.IataCode].Add((edge.Destination.IataCode, edge.Cost));
+                adjList[edge.Origin.IataCode].Add((edge.Destination.IataCode, weightFunc(edge)));
 
             return adjList;
         }
@@ -35,24 +36,29 @@ namespace CheapFlights.Helpers {
         /// <param name="origin">Origin airport iatacode</param>
         /// <param name="destination">Destination airport iatacode</param>
         /// <returns>Shortest path from origin to destination.</returns>
-        public static List<FlightModel> ShortestPath(
-            this Dictionary<string, List<(string, decimal)>> adjList,
+        public static List<Edge<T>> ShortestPath<T>(
+            this Dictionary<string, List<(string, T)>> adjList,
             string origin,
-            string destination) {
+            string destination,
+            T zero,
+            T infinity,
+            Func<T, T, T> addFunc) // TODO clean up
+                where T:IComparable<T> {
+
             if (!adjList.ContainsKey(origin))
                 throw new ArgumentException($"{nameof(origin)} not found in {nameof(adjList)}", nameof(origin));
             if (!adjList.ContainsKey(destination))
                 throw new ArgumentException($"{nameof(destination)} not found in {nameof(adjList)}", nameof(destination));
 
             // initialize list of vertices as undiscovered
-            var vertices = new Dictionary<string, Vertex>();
+            var vertices = new Dictionary<string, Vertex<T>>();
             foreach (var key in adjList.Keys)
-                vertices.Add(key, new Vertex());
+                vertices.Add(key, new Vertex<T>(infinity));
 
             // we consider the origin vertex as discovered
-            vertices[origin] = new Vertex() {
-                Colour = Vertex.ColourType.Grey,
-                Distance = 0,
+            vertices[origin] = new Vertex<T>(infinity) {
+                Colour = Vertex<T>.ColourType.Grey,
+                Distance = zero,
                 Previous = null
             };
 
@@ -63,29 +69,30 @@ namespace CheapFlights.Helpers {
             while (discoveredVertices.TryDequeue(out string currentVertex)) {
                 foreach (var (adjVertex, adjDistance) in adjList[currentVertex]) {
                     // only update the previous vertex and distance, if this is a shorter path
-                    if (vertices[currentVertex].Distance + adjDistance < vertices[adjVertex].Distance) {
-                        vertices[adjVertex].Distance = vertices[currentVertex].Distance + adjDistance;
+                    var currentDistance = addFunc(vertices[currentVertex].Distance, adjDistance);
+                    if (currentDistance.CompareTo(vertices[adjVertex].Distance) < 0) { // TODO
+                        vertices[adjVertex].Distance = currentDistance;
                         vertices[adjVertex].Previous = currentVertex;
                     }
 
-                    if (vertices[adjVertex].Colour == Vertex.ColourType.White) {
-                        vertices[adjVertex].Colour = Vertex.ColourType.Grey;
+                    if (vertices[adjVertex].Colour == Vertex<T>.ColourType.White) {
+                        vertices[adjVertex].Colour = Vertex<T>.ColourType.Grey;
                         discoveredVertices.Enqueue(adjVertex);
                     }
                 }
-                vertices[currentVertex].Colour = Vertex.ColourType.Black;
+                vertices[currentVertex].Colour = Vertex<T>.ColourType.Black;
             }
 
             // get specific path from origin to destination
-            var result = new List<FlightModel>();
+            var result = new List<Edge<T>>();
             var vertex = destination;
             while (vertex != origin) {
                 var previous = vertices[vertex].Previous;
                 var distance = adjList[previous].Where(v => v.Item1 == vertex).First().Item2;
-                result.Add(new FlightModel() {
-                    Origin = new AirportModel() { IataCode = previous },
-                    Destination = new AirportModel() { IataCode = vertex },
-                    Cost = distance
+                result.Add(new Edge<T>() {
+                    Origin = previous,
+                    Destination = vertex,
+                    Distance = distance
                 });
                 vertex = previous;
             }
@@ -94,13 +101,22 @@ namespace CheapFlights.Helpers {
             return result;
         }
 
-        private class Vertex {
+        public class Edge<T> {
+            public string Origin { get; set; }
+            public string Destination { get; set; }
+            public T Distance { get; set; }
+        }
+
+        private class Vertex<T> {
+            public Vertex(T infinity) {
+                Distance = infinity;
+            }
             public enum ColourType {
                 White, Grey, Black
             }
 
             public ColourType Colour { get; set; } = ColourType.White;
-            public decimal Distance { get; set; } = decimal.MaxValue; // default to infinity
+            public T Distance { get; set; }
             public string Previous { get; set; } = null;
         }
     }
