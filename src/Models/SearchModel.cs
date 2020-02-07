@@ -18,6 +18,6 @@ namespace CheapFlights.Models
 
         public IEnumerable<AirportModel> Airports { get; set; }
 
-        public IEnumerable<FlightModel> Flights { get; set; }
+        public IEnumerable<IEnumerable<FlightModel>> Paths { get; set; }
     }
 }

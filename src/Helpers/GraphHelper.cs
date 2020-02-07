@@ -1,123 +1,80 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using CheapFlights.Models;
 
 namespace CheapFlights.Helpers {
     public static class GraphHelpers {
         /// <summary>
-        /// Converts list of edges (specifically flights) into an adjacency list.`
+        /// Converts list of edges (specifically flights) into an adjacency list.
         /// </summary>
-        /// <param name="edgeList">List of graph (specifically flights).</param>
-        /// <returns>Adjacency list of Iatacodes, and distances.</returns>
-        public static Dictionary<string, List<(string, T)>> ToAdjacencyList<T>(
-            this IEnumerable<FlightModel> edgeList,
-            Func<FlightModel, T> weightFunc) {
+        /// <typeparam name="TEdge">Edge type.</typeparam>
+        /// <param name="edges">List of graph edges.</param>
+        /// <param name="getFrom">Function to get origin id of a given TEdge.</param>
+        /// <param name="getTo">Function to get destination id of a given TEdge.</param>
+        /// <returns>Adjacency list representation of graph.</returns>
+        public static Dictionary<string, List<(string, TEdge)>> ToAdjacencyList<TEdge>(
+            this List<TEdge> edges, Func<TEdge, string> getFrom, Func<TEdge, string> getTo) {
 
-            var adjList = new Dictionary<string, List<(string, T)>>();
+            // get list of all distinct vertices
+            var fromVertices = edges.Select(edge => getFrom(edge));
+            var toVertices   = edges.Select(edge => getTo(edge));
+            var distinctVertices = fromVertices.Concat(toVertices).Distinct();
 
-            var originVertices = edgeList.Select(edge => edge.Origin.IataCode);
-            var destinationVertices = edgeList.Select(edge => edge.Destination.IataCode);
-            var distinctVertices = originVertices.Concat(destinationVertices).Distinct();
-
+            // initialize adjList, so that every distinct vertex has an empty list of adjacent vertices
+            var adjList = new Dictionary<string, List<(string, TEdge)>>();
             foreach (var vertex in distinctVertices)
-                adjList.Add(vertex, new List<(string, T)>());
+                adjList.Add(vertex, new List<(string, TEdge)>());
 
-            foreach(var edge in edgeList)
-                adjList[edge.Origin.IataCode].Add((edge.Destination.IataCode, weightFunc(edge)));
+            // add every edge to adjacency list
+            foreach(var edge in edges)
+                adjList[getFrom(edge)].Add((getTo(edge), edge));
 
             return adjList;
         }
 
         /// <summary>
-        /// Finds the shortest path in a weighted graph from origin to destination.
+        /// Find all paths from the source to the target.
         /// </summary>
-        /// <param name="adList">The adjacency list that represents the graph.</param>
-        /// <param name="origin">Origin airport iatacode</param>
-        /// <param name="destination">Destination airport iatacode</param>
-        /// <returns>Shortest path from origin to destination.</returns>
-        public static List<Edge<T>> ShortestPath<T>(
-            this Dictionary<string, List<(string, T)>> adjList,
-            string origin,
-            string destination,
-            T zero,
-            T infinity,
-            Func<T, T, T> addFunc) // TODO clean up
-                where T:IComparable<T> {
+        /// <typeparam name="TEdge">Edge type.</typeparam>
+        /// <param name="adjList">Adjacency list representation of graph.</param>
+        /// <param name="source">Id of the source vertex.</param>
+        /// <param name="target">Id of the target vertex.</param>
+        /// <returns>All paths from source to target.</returns>
+        public static List<List<TEdge>> AllPaths<TEdge>(
+            this Dictionary<string, List<(string, TEdge)>> adjList,
+            string source, string target) {
 
-            if (!adjList.ContainsKey(origin))
-                throw new ArgumentException($"{nameof(origin)} not found in {nameof(adjList)}", nameof(origin));
-            if (!adjList.ContainsKey(destination))
-                throw new ArgumentException($"{nameof(destination)} not found in {nameof(adjList)}", nameof(destination));
+            if (!adjList.ContainsKey(source))
+                throw new ArgumentException($"{nameof(source)} not found in {nameof(adjList)}", nameof(source));
+            if (!adjList.ContainsKey(target))
+                throw new ArgumentException($"{nameof(target)} not found in {nameof(adjList)}", nameof(target));
 
-            // initialize list of vertices as undiscovered
-            var vertices = new Dictionary<string, Vertex<T>>();
-            foreach (var key in adjList.Keys)
-                vertices.Add(key, new Vertex<T>(infinity));
+            // all paths that have been discovered
+            var allPaths = new List<List<(string, TEdge)>>();
 
-            // we consider the origin vertex as discovered
-            vertices[origin] = new Vertex<T>(infinity) {
-                Colour = Vertex<T>.ColourType.Grey,
-                Distance = zero,
-                Previous = null
-            };
+            // initialize all vertices as not visited
+            var visited = new Dictionary<string, bool>();
+            foreach(var key in adjList.Keys)
+                visited.Add(key, false);
 
             // maintain a queue of currently discovered verticies
-            var discoveredVertices = new Queue<string>();
-            discoveredVertices.Enqueue(origin);
+            var discoveredVertices = new Queue<List<(string, TEdge)>>();
+            discoveredVertices.Enqueue(new List<(string, TEdge)>() { (source, default(TEdge)) });
 
-            while (discoveredVertices.TryDequeue(out string currentVertex)) {
-                foreach (var (adjVertex, adjDistance) in adjList[currentVertex]) {
-                    // only update the previous vertex and distance, if this is a shorter path
-                    var currentDistance = addFunc(vertices[currentVertex].Distance, adjDistance);
-                    if (currentDistance.CompareTo(vertices[adjVertex].Distance) < 0) { // TODO
-                        vertices[adjVertex].Distance = currentDistance;
-                        vertices[adjVertex].Previous = currentVertex;
-                    }
-
-                    if (vertices[adjVertex].Colour == Vertex<T>.ColourType.White) {
-                        vertices[adjVertex].Colour = Vertex<T>.ColourType.Grey;
-                        discoveredVertices.Enqueue(adjVertex);
-                    }
+            while (discoveredVertices.TryDequeue(out List<(string, TEdge)> current)) {
+                foreach (var adjacent in adjList[current.Last().Item1]) {
+                    var path = current.Append(adjacent).ToList();
+                    // if we're at the target, add the cuurent path to resulting list of paths
+                    if (adjacent.Item1 == target)
+                        allPaths.Add(path.Skip(1).ToList());
+                    // if we've never visited the adjacent vertex, add it to list of discovered vertices
+                    if (!visited[adjacent.Item1])
+                        discoveredVertices.Enqueue(path);
                 }
-                vertices[currentVertex].Colour = Vertex<T>.ColourType.Black;
+                visited[current.Last().Item1] = true;
             }
 
-            // get specific path from origin to destination
-            var result = new List<Edge<T>>();
-            var vertex = destination;
-            while (vertex != origin) {
-                var previous = vertices[vertex].Previous;
-                var distance = adjList[previous].Where(v => v.Item1 == vertex).First().Item2;
-                result.Add(new Edge<T>() {
-                    Origin = previous,
-                    Destination = vertex,
-                    Distance = distance
-                });
-                vertex = previous;
-            }
-            result.Reverse();
-
-            return result;
-        }
-
-        public class Edge<T> {
-            public string Origin { get; set; }
-            public string Destination { get; set; }
-            public T Distance { get; set; }
-        }
-
-        private class Vertex<T> {
-            public Vertex(T infinity) {
-                Distance = infinity;
-            }
-            public enum ColourType {
-                White, Grey, Black
-            }
-
-            public ColourType Colour { get; set; } = ColourType.White;
-            public T Distance { get; set; }
-            public string Previous { get; set; } = null;
+            return allPaths.Select(path => path.Select(elem => elem.Item2).ToList()).ToList();
         }
     }
 }

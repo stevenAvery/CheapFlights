@@ -51,25 +51,14 @@ namespace CheapFlights.Controllers {
 
             var airports = await _flightsRepository.GetAllAirports();
             var flights = await _flightsRepository.GetAllFlights();
-            var cheapestPath = flights
-                .ToAdjacencyList(flight => flight.Cost)
-                .ShortestPath(searchModel.SelectedOriginId, searchModel.SelectedDestinationId,
-                    0, decimal.MaxValue, (a, b) => a + b) // TODO clean up
-                .Select(edge => {
-                    var flight = flights.First(checkFlight => 
-                        checkFlight.Origin.IataCode == edge.Origin && checkFlight.Destination.IataCode == edge.Destination);
-                    return new FlightModel() {
-                        Origin      = flight.Origin,
-                        Destination = flight.Destination,
-                        Cost        = edge.Distance,
-                        Duration    = flight.Duration
-                    };
-                })
-                .ToList();
+            var paths = flights
+                .ToList() // TODO IEnumerable
+                .ToAdjacencyList(flight => flight.Origin.IataCode, flight => flight.Destination.IataCode)
+                .AllPaths(searchModel.SelectedOriginId, searchModel.SelectedDestinationId);
             
             return View(new SearchModel() {
                 Airports = airports,
-                Flights = cheapestPath
+                Paths = paths
             });
         }
 

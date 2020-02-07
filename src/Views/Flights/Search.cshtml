@@ -32,11 +32,13 @@
     </div>
 }
 
-@if (Model.Flights != null) {
-    <div class="pt-4">
-        <h4>Best Deal @String.Format("{0:C}", @Model.Flights.Sum(m => m.Cost))</h4>
-        @await Html.PartialAsync("_FlightsTable", @Model.Flights)
-    </div>
+@if (Model.Paths != null) {
+    @foreach (var flights in Model.Paths) {
+        <div class="pt-4">
+            <h4>Total: @String.Format("{0:C}", flights.Sum(m => m.Cost))</h4>
+            @await Html.PartialAsync("_FlightsTable", flights)
+        </div>
+    }
 }
 
 <link href="https://cdn.datatables.net/1.10.20/css/dataTables.bootstrap4.min.css" rel="stylesheet" />
