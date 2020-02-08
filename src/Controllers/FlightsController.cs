@@ -50,15 +50,32 @@ namespace CheapFlights.Controllers {
                 return await Search();
 
             var airports = await _flightsRepository.GetAllAirports();
-            var flights = await _flightsRepository.GetAllFlights();
-            var paths = flights
-                .ToList() // TODO IEnumerable
+            var paths = (await _flightsRepository.GetAllFlights())
                 .ToAdjacencyList(flight => flight.Origin.IataCode, flight => flight.Destination.IataCode)
-                .AllPaths(searchModel.SelectedOriginId, searchModel.SelectedDestinationId);
+                .AllPaths(searchModel.SelectedOriginId, searchModel.SelectedDestinationId)
+                .OrderBy(flights => flights.Sum(flight => flight.Cost)); // TODO better sorting
             
+            var bestDeal = paths.Min(flights => flights.Sum(flight => flight.Cost));
+            var shortestDuration = paths.Min(flights => flights.Sum(flight => flight.Duration.Ticks));
+
+            var itineraries = paths
+                .Select(flights => {
+                    var totalCost = flights.Sum(flight => flight.Cost);
+                    var totalDurationTicks = flights.Sum(flight => flight.Duration.Ticks);
+                    return new ItineraryModel() {
+                        TotalCost = totalCost,
+                        TotalDuration = new TimeSpan(totalDurationTicks),
+                        Flights = flights,
+                        IsBestDeal = totalCost == bestDeal,
+                        IsShortestDuration = totalDurationTicks == shortestDuration,
+                        IsDirect = flights.Count() == 1
+                    };
+                })
+                .ToList();
+
             return View(new SearchModel() {
                 Airports = airports,
-                Paths = paths
+                Itineraries = itineraries
             });
         }
 

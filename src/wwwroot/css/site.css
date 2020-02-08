@@ -42,6 +42,7 @@ html {
 }
 
 body {
+  padding-top: 70px;
   /* Margin bottom by footer height */
   margin-bottom: 60px;
 }
@@ -60,4 +61,19 @@ body {
 -------------------------------------------------- */
 .field-validation-error {
   color: red;
+}
+
+.badge-bestDeal {
+  background-color: #5CB85C;
+  color: #FFFFFF;
+}
+
+.badge-shortestDuration {
+  background-color: #F0AD4E;
+  color: #FFFFFF;
+}
+
+.badge-direct {
+  background-color: #D9534F;
+  color: #FFFFFF;
 }

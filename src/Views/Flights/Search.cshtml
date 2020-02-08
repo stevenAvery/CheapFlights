@@ -6,7 +6,7 @@
 
 @using (Html.BeginForm("Search", "Flights", FormMethod.Post, new { id = "searchForm" })) {
     <div class="form-row">
-        <div class="col-sm-5 pt-2">
+        <div class="col-sm-5 pb-2">
             @Html.DropDownListFor(
                 m => m.SelectedOriginId, 
                 new SelectList(Model.Airports, "IataCode", "City"),
@@ -16,7 +16,7 @@
                 })
             @Html.ValidationMessageFor(m => m.SelectedOriginId)
         </div>
-        <div class="col-sm-5 pt-2">
+        <div class="col-sm-5 pb-2">
             @Html.DropDownListFor(
                 m => m.SelectedDestinationId, 
                 new SelectList(Model.Airports, "IataCode", "City"),
@@ -26,17 +26,35 @@
                 })
             @Html.ValidationMessageFor(m => m.SelectedDestinationId)
         </div>
-        <div class="col-sm-2 pt-2">
+        <div class="col-sm-2 pb-2">
             <button type="submit" class="btn btn-primary btn-block">Search</button>
         </div>
     </div>
 }
 
-@if (Model.Paths != null) {
-    @foreach (var flights in Model.Paths) {
+@if (Model.Itineraries != null) {
+    @foreach (var itinerary in Model.Itineraries) {
         <div class="pt-4">
-            <h4>Total: @String.Format("{0:C}", flights.Sum(m => m.Cost))</h4>
-            @await Html.PartialAsync("_FlightsTable", flights)
+            <div class="d-flex justify-content-between">
+                <div>
+                    <h4>
+                        Cost: @String.Format("{0:C}", itinerary.TotalCost),
+                        Duration: @itinerary.TotalDuration.ToString("c")
+                    </h4>
+                </div>
+                <div>
+                    @if (itinerary.IsBestDeal) {
+                        <p class="badge badge-pill badge-bestDeal float-right ml-2 pl-2 pr-2">Best Deal</p>
+                    }
+                    @if (itinerary.IsShortestDuration) {
+                        <p class="badge badge-pill badge-shortestDuration float-right ml-2 pl-2 pr-2">Shortest Duration</p>
+                    }
+                    @if (itinerary.IsDirect) {
+                        <p class="badge badge-pill badge-direct float-right ml-2 pl-2 pr-2">Direct</p>
+                    }
+                </div>
+            </div>
+            @await Html.PartialAsync("_FlightsTable", itinerary.Flights)
         </div>
     }
 }

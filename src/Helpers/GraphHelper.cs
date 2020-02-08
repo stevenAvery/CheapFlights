@@ -13,7 +13,7 @@ namespace CheapFlights.Helpers {
         /// <param name="getTo">Function to get destination id of a given TEdge.</param>
         /// <returns>Adjacency list representation of graph.</returns>
         public static Dictionary<string, List<(string, TEdge)>> ToAdjacencyList<TEdge>(
-            this List<TEdge> edges, Func<TEdge, string> getFrom, Func<TEdge, string> getTo) {
+            this IEnumerable<TEdge> edges, Func<TEdge, string> getFrom, Func<TEdge, string> getTo) {
 
             // get list of all distinct vertices
             var fromVertices = edges.Select(edge => getFrom(edge));
