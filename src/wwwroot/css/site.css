@@ -63,6 +63,11 @@ body {
   color: red;
 }
 
+.badge-suggested {
+  background-color: #1887FF;
+  color: #FFFFFF;
+}
+
 .badge-bestDeal {
   background-color: #5CB85C;
   color: #FFFFFF;

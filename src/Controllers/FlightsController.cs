@@ -11,6 +11,13 @@ using CheapFlights.Helpers;
 namespace CheapFlights.Controllers {
     [Route("")]
     public class FlightsController : Controller {
+        // maintain dollar weight at 1 to keep all weights representitive of dollars
+        private const double DollarWeight = 1.0; 
+        // the amount that an average person would be willing to pay to save an hour in the air 
+        private const double HourWeight = 25.0;
+        // the amount that an average person would be willing to pay to save a segment on their itinerary
+        private const double SegmentWeight = 150.0;
+
         private readonly IFlightsRepository _flightsRepository;
 
         public FlightsController(IFlightsRepository flightsRepository) {
@@ -52,25 +59,29 @@ namespace CheapFlights.Controllers {
             var airports = await _flightsRepository.GetAllAirports();
             var paths = (await _flightsRepository.GetAllFlights())
                 .ToAdjacencyList(flight => flight.Origin.IataCode, flight => flight.Destination.IataCode)
-                .AllPaths(searchModel.SelectedOriginId, searchModel.SelectedDestinationId)
-                .OrderBy(flights => flights.Sum(flight => flight.Cost)); // TODO better sorting
+                .AllPaths(searchModel.SelectedOriginId, searchModel.SelectedDestinationId);
             
             var bestDeal = paths.Min(flights => flights.Sum(flight => flight.Cost));
             var shortestDuration = paths.Min(flights => flights.Sum(flight => flight.Duration.Ticks));
 
             var itineraries = paths
-                .Select(flights => {
+                .Select((flights, index) => {
                     var totalCost = flights.Sum(flight => flight.Cost);
                     var totalDurationTicks = flights.Sum(flight => flight.Duration.Ticks);
                     return new ItineraryModel() {
                         TotalCost = totalCost,
                         TotalDuration = new TimeSpan(totalDurationTicks),
                         Flights = flights,
+                        IsSuggested = index == 0,
                         IsBestDeal = totalCost == bestDeal,
                         IsShortestDuration = totalDurationTicks == shortestDuration,
                         IsDirect = flights.Count() == 1
                     };
                 })
+                .OrderBy(itinerary => 
+                    DollarWeight * (double)itinerary.TotalCost +
+                    HourWeight * (double)itinerary.TotalDuration.TotalHours +
+                    SegmentWeight * (double)itinerary.Flights.Count())
                 .ToList();
 
             return View(new SearchModel() {

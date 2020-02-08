@@ -43,6 +43,9 @@
                     </h4>
                 </div>
                 <div>
+                    @if (itinerary.IsSuggested) {
+                        <p class="badge badge-pill badge-primary float-right ml-2 pl-2 pr-2">Suggested</p>
+                    }
                     @if (itinerary.IsBestDeal) {
                         <p class="badge badge-pill badge-bestDeal float-right ml-2 pl-2 pr-2">Best Deal</p>
                     }

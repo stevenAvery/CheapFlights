@@ -7,8 +7,10 @@ namespace CheapFlights.Models
         public TimeSpan TotalDuration { get; set; }
         public Decimal TotalCost { get; set; }
         public IEnumerable<FlightModel> Flights { get; set; }
-        public Boolean IsBestDeal { get; set; } = false;
-        public Boolean IsDirect { get; set; } = false;
-        public Boolean IsShortestDuration { get; set; } = false;
+
+        public bool IsSuggested { get; set; } = false;
+        public bool IsBestDeal { get; set; } = false;
+        public bool IsDirect { get; set; } = false;
+        public bool IsShortestDuration { get; set; } = false;
     }
 }
