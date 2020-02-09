@@ -1,14 +1,14 @@
 ﻿@model ErrorViewModel
+
 @{
     ViewData["Title"] = "Error";
 }
 
 <div class="card mx-auto col-md-8 col-lg-6">
-  <div class="card-body">
-    <h1 class="card-title">@Model.StatusCode @Model.ReasonPhrase</h1>
-    <p class="text-muted">An error occured and your request could not be completed. Please try again later.</p>
+    <div class="card-body">
+        <h1 class="card-title">@Model.StatusCode @Model.ReasonPhrase</h1>
+        <p class="text-muted">An error occured and your request could not be completed. Please try again later.</p>
 
-    @Html.ActionLink("Return to home page", "Flights", "Flights", new { @class = "card-link" }, null)
-  </div>
+        @Html.ActionLink("Return to home page", "Flights", "Flights", new { @class = "card-link" }, null)
+    </div>
 </div>
-

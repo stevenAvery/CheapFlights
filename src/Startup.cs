@@ -21,7 +21,7 @@ namespace CheapFlights {
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
+        /// <summary>Add services to the container.</summary>
         public void ConfigureServices(IServiceCollection services) {
             services.Configure<CookiePolicyOptions>(options => {
                 // This lambda determines whether user consent for non-essential cookies is needed for a given request.
@@ -36,7 +36,7 @@ namespace CheapFlights {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        /// <summary>Configure the HTTP request pipeline.</summary>
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ApplicationDbContext context) {
             app.UseStatusCodePagesWithReExecute("/Error/{0}");
             app.UseStaticFiles();
