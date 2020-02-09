@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace CheapFlights.Models
 {
-    public class ItineraryModel {
+    public class ItineraryViewModel {
         public TimeSpan TotalDuration { get; set; }
         public Decimal TotalCost { get; set; }
         public IEnumerable<FlightModel> Flights { get; set; }

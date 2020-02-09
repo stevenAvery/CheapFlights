@@ -1,12 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using CheapFlights.Models;
 using CheapFlights.Repositories;
 using CheapFlights.Helpers;
+using Microsoft.AspNetCore.WebUtilities;
 
 namespace CheapFlights.Controllers {
     [Route("")]
@@ -41,7 +40,7 @@ namespace CheapFlights.Controllers {
         [HttpGet, Route("Search")]
         public async Task<IActionResult> Search() {
             var airports = await _flightsRepository.GetAllAirports();
-            return View(new SearchModel() {
+            return View(new SearchViewModel() {
                 Airports = airports
             });
         }
@@ -49,17 +48,17 @@ namespace CheapFlights.Controllers {
         /// <summary>
         /// Action to search for cheapest path from specific pair of airports in the application database.
         /// </summary>
-        /// <param name="searchModel">Contains origin and destination for search.</param>
+        /// <param name="search">Contains origin and destination for search.</param>
         /// <returns>Search view with list of airports in application database, and cheapest path from origin to detination.</returns>
         [HttpPost, Route("Search")]
-        public async Task<IActionResult> Search(SearchModel searchModel) {
+        public async Task<IActionResult> Search(SearchViewModel search) {
             if (!ModelState.IsValid)
                 return await Search();
 
             var airports = await _flightsRepository.GetAllAirports();
             var paths = (await _flightsRepository.GetAllFlights())
                 .ToAdjacencyList(flight => flight.Origin.IataCode, flight => flight.Destination.IataCode)
-                .AllPaths(searchModel.SelectedOriginId, searchModel.SelectedDestinationId);
+                .AllPaths(search.SelectedOriginId, search.SelectedDestinationId);
             
             var bestDeal = paths.Min(flights => flights.Sum(flight => flight.Cost));
             var shortestDuration = paths.Min(flights => flights.Sum(flight => flight.Duration.Ticks));
@@ -68,7 +67,7 @@ namespace CheapFlights.Controllers {
                 .Select((flights, index) => {
                     var totalCost = flights.Sum(flight => flight.Cost);
                     var totalDurationTicks = flights.Sum(flight => flight.Duration.Ticks);
-                    return new ItineraryModel() {
+                    return new ItineraryViewModel() {
                         TotalCost = totalCost,
                         TotalDuration = new TimeSpan(totalDurationTicks),
                         Flights = flights,
@@ -84,15 +83,24 @@ namespace CheapFlights.Controllers {
                     SegmentWeight * (double)itinerary.Flights.Count())
                 .ToList();
 
-            return View(new SearchModel() {
+            return View(new SearchViewModel() {
                 Airports = airports,
                 Itineraries = itineraries
             });
         }
 
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error() {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        /// <summary>
+        /// Shows appropriate error page for a given status code.
+        /// Called by error status code re-execute.
+        /// </summary>
+        /// <param name="statusCode">Error status code that occured.</param>
+        /// <returns>error page for the given status code.</returns>
+        [Route("Error/{statusCode}")]
+        public IActionResult Error(int statusCode) {
+            return View(new ErrorViewModel { 
+                StatusCode = statusCode,
+                ReasonPhrase = ReasonPhrases.GetReasonPhrase(statusCode)
+            });
         }
     }
 }

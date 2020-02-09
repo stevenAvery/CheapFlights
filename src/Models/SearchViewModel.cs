@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace CheapFlights.Models
 {
-    public class SearchModel
+    public class SearchViewModel
     {
         [Required(ErrorMessage = "Origin is required.")]
         [DisplayName("Origin")]
@@ -18,6 +18,6 @@ namespace CheapFlights.Models
 
         public IEnumerable<AirportModel> Airports { get; set; }
 
-        public IEnumerable<ItineraryModel> Itineraries { get; set; }
+        public IEnumerable<ItineraryViewModel> Itineraries { get; set; }
     }
 }
