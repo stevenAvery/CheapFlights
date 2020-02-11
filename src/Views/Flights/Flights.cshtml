@@ -13,9 +13,9 @@
         </tr>
         <tr>
             <th>City</th>
-            <th>IATA Code</th>
+            <th>Code</th>
             <th>City</th>
-            <th>IATA Code</th>
+            <th>Code</th>
             <th>Duration</th>
             <th>Cost</th>
         </tr>
@@ -28,7 +28,7 @@
     <script>
         $(document).ready(() => {
             $("#flightsTable").DataTable({
-                processing: true,
+                processing: false,
                 serverSide: true,
                 ajax:  {
                     url: "/Flights/Data",
