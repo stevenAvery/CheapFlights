@@ -6,17 +6,17 @@ using CheapFlights.Models;
 using CheapFlights.Repositories;
 using CheapFlights.Helpers;
 using Microsoft.AspNetCore.WebUtilities;
-using System.Globalization;
+using System.Collections.Generic;
 
 namespace CheapFlights.Controllers {
     [Route("")]
     public class FlightsController : Controller {
         // maintain dollar weight at 1 to keep all weights representitive of dollars
-        private const double DollarWeight = 1.0; 
+        private const double _DollarWeight = 1.0; 
         // the amount that an average person would be willing to pay to save an hour in the air 
-        private const double HourWeight = 25.0;
+        private const double _HourWeight = 25.0;
         // the amount that an average person would be willing to pay to save a segment on their itinerary
-        private const double SegmentWeight = 150.0;
+        private const double _SegmentWeight = 150.0;
 
         private readonly IFlightsRepository _flightsRepository;
 
@@ -41,32 +41,23 @@ namespace CheapFlights.Controllers {
         /// <returns>Filtered list of flights in the application database.</returns>
         [HttpGet, Route("Flights/Data")]
         public async Task<IActionResult> FlightsData(DataTablesParamsModel sentParams) {
-            var data = await _flightsRepository.GetAllFlights();
+            var flights = await _flightsRepository.GetAllFlights();
 
-            // TODO make this work on generic objects to reduce coupling / hardcoding
-            CultureInfo enCulture = new CultureInfo("en-CA", false);
-            var filteredData = String.IsNullOrWhiteSpace(sentParams.SearchValue)
-                ? data
-                : data.Where(flight => enCulture.CompareInfo.IndexOf(
-                    flight.ToString(), sentParams.SearchValue, CompareOptions.IgnoreCase) >= 0);
+            var filteredData = flights.SearchFilter(sentParams.SearchValue);
+            filteredData = filteredData.OrderByColumn(new Dictionary<int, Func<FlightModel, object>>() {
+                { 0, flight => flight.Origin.City },
+                { 1, flight => flight.Origin.IataCode },
+                { 2, flight => flight.Destination.City },
+                { 3, flight => flight.Destination.IataCode },
+                { 4, flight => flight.Duration.Ticks },
+                { 5, flight => flight.Cost },
+            }, sentParams.OrderColumn, sentParams.OrderDirection == "asc");
 
-            // TODO better way to map int id to object property to reduce coupling / hardcoding
-            switch (sentParams.OrderColumn) {
-                case 0: filteredData = filteredData.OrderBy(flight => flight.Origin.City); break;
-                case 1: filteredData = filteredData.OrderBy(flight => flight.Origin.IataCode); break;
-                case 2: filteredData = filteredData.OrderBy(flight => flight.Destination.City); break;
-                case 3: filteredData = filteredData.OrderBy(flight => flight.Destination.IataCode); break;
-                case 4: filteredData = filteredData.OrderBy(flight => flight.Duration.Ticks); break;
-                case 5: filteredData = filteredData.OrderBy(flight => flight.Cost); break;
-            }
-            if (sentParams.OrderDirection == "desc")
-                filteredData = filteredData.Reverse();
-
-            var paginatedData = filteredData.Skip(sentParams.Start).Take(sentParams.Length);
+            var paginatedData = filteredData.Paginate(sentParams.Start, sentParams.Length);
             
             return new JsonResult(new DataTablesResultModel<FlightModel>() {
                 Draw = sentParams.Draw,
-                RecordsTotal = data.Count(),
+                RecordsTotal = flights.Count(),
                 RecordsFiltered = filteredData.Count(),
                 Data = paginatedData
             });
@@ -94,14 +85,17 @@ namespace CheapFlights.Controllers {
             if (!ModelState.IsValid)
                 return await Search();
 
+            // get all paths from origin airport to destination airport
             var airports = await _flightsRepository.GetAllAirports();
             var paths = (await _flightsRepository.GetAllFlights())
                 .ToAdjacencyList(flight => flight.Origin.IataCode, flight => flight.Destination.IataCode)
                 .AllPaths(search.SelectedOriginId, search.SelectedDestinationId);
             
+            // find noteworthy paths
             var bestDeal = paths.Min(flights => flights.Sum(flight => flight.Cost));
             var shortestDuration = paths.Min(flights => flights.Sum(flight => flight.Duration.Ticks));
 
+            // generate flight itineraries from paths
             var itineraries = paths
                 .Select((flights, index) => {
                     var totalCost = flights.Sum(flight => flight.Cost);
@@ -117,9 +111,9 @@ namespace CheapFlights.Controllers {
                     };
                 })
                 .OrderBy(itinerary => 
-                    DollarWeight * (double)itinerary.TotalCost +
-                    HourWeight * (double)itinerary.TotalDuration.TotalHours +
-                    SegmentWeight * (double)itinerary.Flights.Count())
+                    _DollarWeight * (double)itinerary.TotalCost +
+                    _HourWeight * (double)itinerary.TotalDuration.TotalHours +
+                    _SegmentWeight * (double)itinerary.Flights.Count())
                 .ToList();
 
             return View(new SearchViewModel() {
