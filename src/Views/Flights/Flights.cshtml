@@ -50,15 +50,20 @@
                     { data: "origin.iataCode" },
                     { data: "destination.city" },
                     { data: "destination.iataCode" },
-                    { data: "cost" },
-                    { data: "duration" }
+                    { data: "duration" },
+                    { data: "cost" }
                 ],
                 columnDefs: [
+                    {
+                        render: (data, type, row) => 
+                            parseInt(data.split(":")[0]) + "h " + parseInt(data.split(":")[1]) + "m",
+                        targets: 4
+                    },
                     // Render cost in currency format
                     {
                         render: (data, type, row) =>
                             data.toLocaleString("en-CA", { style: "currency", currency: "CAD" }),
-                        targets: 4
+                        targets: 5
                     }
                 ]
             });

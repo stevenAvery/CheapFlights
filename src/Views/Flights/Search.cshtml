@@ -1,7 +1,7 @@
 @model CheapFlights.Models.SearchViewModel
 
 @{
-    ViewData["Title"] = "Search Flights";
+    ViewData["Title"] = "Search";
 }
 
 @using (Html.BeginForm("Search", "Flights", FormMethod.Post, new { id = "searchForm" })) {
@@ -34,30 +34,6 @@
 
 @if (Model.Itineraries != null) {
     @foreach (var itinerary in Model.Itineraries) {
-        <div class="pt-4">
-            <div class="d-flex justify-content-between">
-                <div>
-                    <h4>
-                        Cost: @String.Format("{0:C}", itinerary.TotalCost),
-                        Duration: @itinerary.TotalDuration.ToString("c")
-                    </h4>
-                </div>
-                <div>
-                    @if (itinerary.IsSuggested) {
-                        <p class="badge badge-pill badge-primary float-right ml-2 pl-2 pr-2">Suggested</p>
-                    }
-                    @if (itinerary.IsBestDeal) {
-                        <p class="badge badge-pill badge-bestDeal float-right ml-2 pl-2 pr-2">Best Deal</p>
-                    }
-                    @if (itinerary.IsShortestDuration) {
-                        <p class="badge badge-pill badge-shortestDuration float-right ml-2 pl-2 pr-2">Shortest Duration</p>
-                    }
-                    @if (itinerary.IsDirect) {
-                        <p class="badge badge-pill badge-direct float-right ml-2 pl-2 pr-2">Direct</p>
-                    }
-                </div>
-            </div>
-            @await Html.PartialAsync("_FlightsTable", itinerary.Flights)
-        </div>
+        @await Html.PartialAsync("_Itinerary", itinerary)
     }
 }

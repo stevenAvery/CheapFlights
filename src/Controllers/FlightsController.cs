@@ -56,8 +56,8 @@ namespace CheapFlights.Controllers {
                 case 1: filteredData = filteredData.OrderBy(flight => flight.Origin.IataCode); break;
                 case 2: filteredData = filteredData.OrderBy(flight => flight.Destination.City); break;
                 case 3: filteredData = filteredData.OrderBy(flight => flight.Destination.IataCode); break;
-                case 4: filteredData = filteredData.OrderBy(flight => flight.Cost); break;
-                case 5: filteredData = filteredData.OrderBy(flight => flight.Duration); break;
+                case 4: filteredData = filteredData.OrderBy(flight => flight.Duration.Ticks); break;
+                case 5: filteredData = filteredData.OrderBy(flight => flight.Cost); break;
             }
             if (sentParams.OrderDirection == "desc")
                 filteredData = filteredData.Reverse();
