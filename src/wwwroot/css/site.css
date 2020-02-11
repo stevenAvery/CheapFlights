@@ -59,6 +59,13 @@ body {
 
 /* Custom CSS
 -------------------------------------------------- */
+.brand {
+  height: 28px;
+}
+.brandColour {
+  color: #1887FF;
+}
+
 .field-validation-error {
   color: red;
 }
@@ -67,17 +74,14 @@ body {
   background-color: #1887FF;
   color: #FFFFFF;
 }
-
 .badge-bestDeal {
   background-color: #5CB85C;
   color: #FFFFFF;
 }
-
 .badge-shortestDuration {
   background-color: #F0AD4E;
   color: #FFFFFF;
 }
-
 .badge-direct {
   background-color: #D9534F;
   color: #FFFFFF;

@@ -3,7 +3,8 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - CheapFlights</title>
+    <title>@ViewData["Title"] - Cheap Flights</title>
+    <link rel="icon" href="/img/favicon.ico"/>
 
     <environment include="Development">
         <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
@@ -22,7 +23,10 @@
     <header>
         <nav class="navbar fixed-top navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container">
-                <a class="navbar-brand" asp-area="" asp-controller="Flights" asp-action="Flights">CheapFlights</a>
+                <a class="navbar-brand" asp-area="" asp-controller="Flights" asp-action="Flights">
+                    <img src="/img/logo.png" alt="Cheap Flights Logo" class="brand">
+                    <span class="brandColour">CheapFlights</span>
+                </a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>

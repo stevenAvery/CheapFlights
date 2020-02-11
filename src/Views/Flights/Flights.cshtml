@@ -35,14 +35,6 @@
                     type: "Get",
                     datatype: "json",
                     data: (data) => {
-                        console.log({
-                            Draw: data.draw,
-                            Start: data.start,
-                            Length: data.length,
-                            SearchValue : data.search.value,
-                            OrderColumn: data.order[0].column,
-                            OrderDirection: data.order[0].dir
-                        });
                         return {
                             Draw: data.draw,
                             Start: data.start,
