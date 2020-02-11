@@ -9,5 +9,8 @@ namespace CheapFlights.Models {
         [Required]
         [StringLength(50)]
         public string City { get; set; }
+
+        public override string ToString() => 
+            $"{City}\n{IataCode}";
     }
 }

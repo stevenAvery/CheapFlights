@@ -4,14 +4,72 @@
     ViewData["Title"] = "Flights";
 }
 
-@await Html.PartialAsync("_FlightsTable", @Model)
+<table id="flightsTable" class="table table-bordered display" width="100%">
+    <thead>
+        <tr>
+            <th colspan="2" class="text-center">Origin</th>
+            <th colspan="2" class="text-center">Destination</th>
+            <th colspan="2" class="text-center">Flight Details</th>
+        </tr>
+        <tr>
+            <th>City</th>
+            <th>IATA Code</th>
+            <th>City</th>
+            <th>IATA Code</th>
+            <th>Duration</th>
+            <th>Cost</th>
+        </tr>
+    </thead>
+</table>
 
 @section Scripts {
     <script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.10.20/js/dataTables.bootstrap4.min.js"></script>
     <script>
         $(document).ready(() => {
-            $("#flightsTable").DataTable();
+            $("#flightsTable").DataTable({
+                processing: true,
+                serverSide: true,
+                ajax:  {
+                    url: "/Flights/Data",
+                    type: "Get",
+                    datatype: "json",
+                    data: (data) => {
+                        console.log({
+                            Draw: data.draw,
+                            Start: data.start,
+                            Length: data.length,
+                            SearchValue : data.search.value,
+                            OrderColumn: data.order[0].column,
+                            OrderDirection: data.order[0].dir
+                        });
+                        return {
+                            Draw: data.draw,
+                            Start: data.start,
+                            Length: data.length,
+                            SearchValue : data.search.value,
+                            OrderColumn: data.order[0].column,
+                            OrderDirection: data.order[0].dir
+                        };
+                    }
+                },
+                columns: [
+                    { data: "origin.city" },
+                    { data: "origin.iataCode" },
+                    { data: "destination.city" },
+                    { data: "destination.iataCode" },
+                    { data: "cost" },
+                    { data: "duration" }
+                ],
+                columnDefs: [
+                    // Render cost in currency format
+                    {
+                        render: (data, type, row) =>
+                            data.toLocaleString("en-CA", { style: "currency", currency: "CAD" }),
+                        targets: 4
+                    }
+                ]
+            });
         });
     </script>
 }

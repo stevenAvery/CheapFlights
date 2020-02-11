@@ -19,5 +19,9 @@ namespace CheapFlights.Models {
 
         [Required]
         public TimeSpan Duration { get; set; }
+
+        public override string ToString() => 
+            $"{Origin.ToString()}\n{Destination.ToString()}\n{Cost.ToString()}\n{Duration.ToString()}";
+            
     }
 }

@@ -6,6 +6,7 @@ using CheapFlights.Models;
 using CheapFlights.Repositories;
 using CheapFlights.Helpers;
 using Microsoft.AspNetCore.WebUtilities;
+using System.Globalization;
 
 namespace CheapFlights.Controllers {
     [Route("")]
@@ -31,6 +32,44 @@ namespace CheapFlights.Controllers {
         public async Task<IActionResult> Flights() {
             var flights = await _flightsRepository.GetAllFlights();
             return View(flights);
+        }
+
+        /// <summary>
+        /// Get all flight data in the application database, with paging, sorting, and searching.
+        /// </summary>
+        /// <param name="sentParams">Object to specify paging, sorting, and searching of flight data.</param>
+        /// <returns>Filtered list of flights in the application database.</returns>
+        [HttpGet, Route("Flights/Data")]
+        public async Task<IActionResult> FlightsData(DataTablesParamsModel sentParams) {
+            var data = await _flightsRepository.GetAllFlights();
+
+            // TODO make this work on generic objects to reduce coupling / hardcoding
+            CultureInfo enCulture = new CultureInfo("en-CA", false);
+            var filteredData = String.IsNullOrWhiteSpace(sentParams.SearchValue)
+                ? data
+                : data.Where(flight => enCulture.CompareInfo.IndexOf(
+                    flight.ToString(), sentParams.SearchValue, CompareOptions.IgnoreCase) >= 0);
+
+            // TODO better way to map int id to object property to reduce coupling / hardcoding
+            switch (sentParams.OrderColumn) {
+                case 0: filteredData = filteredData.OrderBy(flight => flight.Origin.City); break;
+                case 1: filteredData = filteredData.OrderBy(flight => flight.Origin.IataCode); break;
+                case 2: filteredData = filteredData.OrderBy(flight => flight.Destination.City); break;
+                case 3: filteredData = filteredData.OrderBy(flight => flight.Destination.IataCode); break;
+                case 4: filteredData = filteredData.OrderBy(flight => flight.Cost); break;
+                case 5: filteredData = filteredData.OrderBy(flight => flight.Duration); break;
+            }
+            if (sentParams.OrderDirection == "desc")
+                filteredData = filteredData.Reverse();
+
+            var paginatedData = filteredData.Skip(sentParams.Start).Take(sentParams.Length);
+            
+            return new JsonResult(new DataTablesResultModel<FlightModel>() {
+                Draw = sentParams.Draw,
+                RecordsTotal = data.Count(),
+                RecordsFiltered = filteredData.Count(),
+                Data = paginatedData
+            });
         }
 
         /// <summary>
