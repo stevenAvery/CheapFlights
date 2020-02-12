@@ -97,14 +97,14 @@ namespace CheapFlights.Controllers {
 
             // generate flight itineraries from paths
             var itineraries = paths
-                .Select((flights, index) => {
+                .Select(flights => {
                     var totalCost = flights.Sum(flight => flight.Cost);
                     var totalDurationTicks = flights.Sum(flight => flight.Duration.Ticks);
                     return new ItineraryViewModel() {
                         TotalCost = totalCost,
                         TotalDuration = new TimeSpan(totalDurationTicks),
                         Flights = flights,
-                        IsSuggested = index == 0,
+                        IsSuggested = false,
                         IsBestDeal = totalCost == bestDeal,
                         IsShortestDuration = totalDurationTicks == shortestDuration,
                         IsDirect = flights.Count() == 1
@@ -115,6 +115,7 @@ namespace CheapFlights.Controllers {
                     _HourWeight * (double)itinerary.TotalDuration.TotalHours +
                     _SegmentWeight * (double)itinerary.Flights.Count())
                 .ToList();
+            itineraries.First().IsSuggested = true; // suggest the itinerary that is ranked the best
 
             return PartialView("_Itineraries", itineraries);
         }

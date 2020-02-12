@@ -120,7 +120,7 @@ namespace CheapFlights.Data {
                 context.Flights.Add(new FlightModel() {
                     Origin      = context.Airports.First(airport => airport.IataCode == "DXB"),
                     Destination = context.Airports.First(airport => airport.IataCode == "CPT"),
-                    Cost = 2000.00M,
+                    Cost = 1400.00M,
                     Duration = new TimeSpan(9, 55, 0)
                 });
                 context.Flights.Add(new FlightModel() {
@@ -169,9 +169,26 @@ namespace CheapFlights.Data {
                     Origin      = context.Airports.First(airport => airport.IataCode == "DEL"),
                     Destination = context.Airports.First(airport => airport.IataCode == "ATL"),
                     Cost = 2200.00M,
-                    Duration = new TimeSpan(16,27, 0)
+                    Duration = new TimeSpan(16, 27, 0)
                 });
-
+                context.Flights.Add(new FlightModel() {
+                    Origin      = context.Airports.First(airport => airport.IataCode == "ATL"),
+                    Destination = context.Airports.First(airport => airport.IataCode == "CPT"),
+                    Cost = 4000.00M,
+                    Duration = new TimeSpan(15, 58, 0)
+                });
+                context.Flights.Add(new FlightModel() {
+                    Origin      = context.Airports.First(airport => airport.IataCode == "ATL"),
+                    Destination = context.Airports.First(airport => airport.IataCode == "CPT"),
+                    Cost = 4600.00M,
+                    Duration = new TimeSpan(15, 58, 0)
+                });
+                context.Flights.Add(new FlightModel() {
+                    Origin      = context.Airports.First(airport => airport.IataCode == "YYZ"),
+                    Destination = context.Airports.First(airport => airport.IataCode == "CPT"),
+                    Cost = 4400.00M,
+                    Duration = new TimeSpan(16, 1, 0)
+                });
                 context.SaveChanges();
             }
         }

@@ -15,8 +15,5 @@ dotnet run --project src
 ### Flights
 ![Flights](docs/Flights.png)
 
-### Search (Empty)
-![Search (Empty)](docs/SearchEmpty.png)
-
 ### Search
 ![Search](docs/Search.png)
