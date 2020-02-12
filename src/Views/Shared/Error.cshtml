@@ -1,12 +1,13 @@
-﻿@model ErrorViewModel
+﻿@using Microsoft.AspNetCore.WebUtilities;
+@model ErrorViewModel
 
 @{
-    ViewData["Title"] = "Error";
+    ViewData["Title"] = @ReasonPhrases.GetReasonPhrase(Model.StatusCode);
 }
 
 <div class="card mx-auto col-md-8 col-lg-6">
     <div class="card-body">
-        <h1 class="card-title">@Model.StatusCode @Model.ReasonPhrase</h1>
+        <h1 class="card-title">@Model.StatusCode @ReasonPhrases.GetReasonPhrase(Model.StatusCode)</h1>
         <p class="text-muted">An error occured and your request could not be completed. Please try again later.</p>
 
         @Html.ActionLink("Return to home page", "Flights", "Flights", new { @class = "card-link" }, null)

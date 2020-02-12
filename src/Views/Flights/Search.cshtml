@@ -4,7 +4,10 @@
     ViewData["Title"] = "Search";
 }
 
-@using (Html.BeginForm("Search", "Flights", FormMethod.Post, new { id = "searchForm" })) {
+<form asp-action="Search" asp-asp-controller="Flights" method="POST" 
+    data-ajax="true" data-ajax-mode="replace" data-ajax-update="#itineraries"
+    id="searchForm">
+
     <div class="form-row">
         <div class="col-sm-5 pb-2">
             @Html.DropDownListFor(
@@ -27,13 +30,16 @@
             @Html.ValidationMessageFor(m => m.SelectedDestinationId)
         </div>
         <div class="col-sm-2 pb-2">
-            <button type="submit" class="btn btn-primary btn-block">Search</button>
+            <button type="submit" class="use-ajax btn btn-primary btn-block">Search</button>
         </div>
     </div>
-}
+</form>
 
-@if (Model.Itineraries != null) {
-    @foreach (var itinerary in Model.Itineraries) {
-        @await Html.PartialAsync("_Itinerary", itinerary)
-    }
+@* gets populated by  *@
+<div id="itineraries"></div>
+
+@section scripts{ 
+    <script>
+        
+    </script>
 }

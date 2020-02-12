@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 using CheapFlights.Models;
 using CheapFlights.Repositories;
 using CheapFlights.Helpers;
-using Microsoft.AspNetCore.WebUtilities;
 using System.Collections.Generic;
 
 namespace CheapFlights.Controllers {
@@ -14,9 +13,9 @@ namespace CheapFlights.Controllers {
         // maintain dollar weight at 1 to keep all weights representitive of dollars
         private const double _DollarWeight = 1.0; 
         // the amount that an average person would be willing to pay to save an hour in the air 
-        private const double _HourWeight = 25.0;
+        private const double _HourWeight = 40.0;
         // the amount that an average person would be willing to pay to save a segment on their itinerary
-        private const double _SegmentWeight = 150.0;
+        private const double _SegmentWeight = 200.0;
 
         private readonly IFlightsRepository _flightsRepository;
 
@@ -82,11 +81,12 @@ namespace CheapFlights.Controllers {
         /// <returns>Search view with list of airports in application database, and cheapest path from origin to detination.</returns>
         [HttpPost, Route("Search")]
         public async Task<IActionResult> Search(SearchViewModel search) {
-            if (!ModelState.IsValid)
-                return await Search();
+
+            if (search.SelectedOriginId == null || search.SelectedDestinationId == null || 
+                search.SelectedOriginId == search.SelectedDestinationId)
+                return PartialView("_Itineraries", new List<ItineraryViewModel>());
 
             // get all paths from origin airport to destination airport
-            var airports = await _flightsRepository.GetAllAirports();
             var paths = (await _flightsRepository.GetAllFlights())
                 .ToAdjacencyList(flight => flight.Origin.IataCode, flight => flight.Destination.IataCode)
                 .AllPaths(search.SelectedOriginId, search.SelectedDestinationId);
@@ -116,10 +116,7 @@ namespace CheapFlights.Controllers {
                     _SegmentWeight * (double)itinerary.Flights.Count())
                 .ToList();
 
-            return View(new SearchViewModel() {
-                Airports = airports,
-                Itineraries = itineraries
-            });
+            return PartialView("_Itineraries", itineraries);
         }
 
         /// <summary>
@@ -131,8 +128,7 @@ namespace CheapFlights.Controllers {
         [Route("Error/{statusCode}")]
         public IActionResult Error(int statusCode) {
             return View(new ErrorViewModel { 
-                StatusCode = statusCode,
-                ReasonPhrase = ReasonPhrases.GetReasonPhrase(statusCode)
+                StatusCode = statusCode
             });
         }
     }

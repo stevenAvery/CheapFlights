@@ -1,0 +1,63 @@
+@model List<ItineraryViewModel>
+
+@if (Model == null || Model.Count() == 0) {
+    <div class="mx-auto col-12 text-center pt-5">
+        <h3>No itineraries found</h3>
+    </div>
+} else {
+    @foreach (var itinerary in Model) {
+        <div class="pt-4">
+            <div class="d-flex justify-content-between">
+                <div>
+                    <h4>
+                        Cost: @String.Format("{0:C}", itinerary.TotalCost),
+                        Duration: @string.Format("{0}h {1}m", (int)itinerary.TotalDuration.TotalHours, itinerary.TotalDuration.Minutes)
+                    </h4>
+                </div>
+                <div>
+                    @if (itinerary.IsSuggested) {
+                        <p class="badge badge-pill badge-primary float-right ml-2 pl-2 pr-2">Suggested</p>
+                    }
+                    @if (itinerary.IsBestDeal) {
+                        <p class="badge badge-pill badge-bestDeal float-right ml-2 pl-2 pr-2">Best Deal</p>
+                    }
+                    @if (itinerary.IsShortestDuration) {
+                        <p class="badge badge-pill badge-shortestDuration float-right ml-2 pl-2 pr-2">Shortest Duration</p>
+                    }
+                    @if (itinerary.IsDirect) {
+                        <p class="badge badge-pill badge-direct float-right ml-2 pl-2 pr-2">Direct</p>
+                    }
+                </div>
+            </div>
+            <table class="table table-bordered display" width="100%">
+                <thead>
+                    <tr>
+                        <th colspan="2" class="text-center">Origin</th>
+                        <th colspan="2" class="text-center">Destination</th>
+                        <th colspan="2" class="text-center">Flight Details</th>
+                    </tr>
+                    <tr>
+                        <th>City</th>
+                        <th>Code</th>
+                        <th>City</th>
+                        <th>Code</th>
+                        <th>Duration</th>
+                        <th>Cost</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (var flight in itinerary.Flights) {
+                    <tr>
+                        <td>@flight.Origin.City</td>
+                        <td>@flight.Origin.IataCode</td>
+                        <td>@flight.Destination.City</td>
+                        <td>@flight.Destination.IataCode</td>
+                        <td>@string.Format("{0}h {1}m", (int)flight.Duration.TotalHours, flight.Duration.Minutes)</td>
+                        <td class="text-right">@string.Format("{0:C}", @flight.Cost)</td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    }
+}
